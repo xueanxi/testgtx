@@ -197,7 +197,7 @@ public class PlayStage extends BaseStage {
         Camera camera = this.getCamera();
         //camera.translate(100,0,0);
         //camera.rotate(0,45,45,0);
-        
+
 
 
     }
