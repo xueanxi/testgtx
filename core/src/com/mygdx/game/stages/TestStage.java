@@ -8,8 +8,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.AlphaAction;
@@ -28,26 +26,25 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.MainGame;
 import com.mygdx.game.log.Logs;
 import com.mygdx.game.res.Res;
 
-import java.awt.Font;
+import java.sql.Time;
 
 /**
  * Created by user on 3/20/18.
  */
 
-public class PlayStage extends BaseStage {
+public class TestStage extends BaseStage {
 
 
 
     /** 舞台背景颜色, 60% 黑色 */
-    private final Color bgColor = new Color(0, 0, 0, 1F);
+    private final Color bgColor = new Color(0, 1, 0, 1F);
     private final Color bgColor2 = new Color(1, 0, 0, 1F);
 
     /** 提示文本的颜色 */
@@ -64,13 +61,14 @@ public class PlayStage extends BaseStage {
     /** 返回按钮 */
     private Button backButton;
     private TextButton dailogButton;
+    private TextButton fenbianlvButton;
+    private TextButton cameraButton;
     private Dialog dialog;
 
     Skin skin;
 
 
-
-    public PlayStage(MainGame mainGame, Viewport viewport) {
+    public TestStage(MainGame mainGame, Viewport viewport) {
         super(mainGame, viewport);
         init();
     }
@@ -81,7 +79,7 @@ public class PlayStage extends BaseStage {
          */
         // Res.AtlasNames.GAME_BLANK 是一张纯白色的小图片
         bgImage = new Image(getMainGame().getAtlas().findRegion(Res.AtlasNames.GAME_BLANK));
-        //bgImage.setColor(bgColor);
+        bgImage.setColor(bgColor);
         bgImage.setOrigin(0, 0);
         // 缩放到铺满整个舞台
         bgImage.setScale(getWidth() / bgImage.getWidth(), getHeight() / bgImage.getHeight());
@@ -107,7 +105,7 @@ public class PlayStage extends BaseStage {
             public void clicked(InputEvent event, float x, float y) {
                 // 点击返回按钮, 隐藏结束舞台（返回主游戏舞台）
                 //getMainGame().getGameScreen().hideGameOverStage();
-                getMainGame().getMainScreen().showPlayStage2();
+                getMainGame().getMainScreen().showDpiStage();
             }
         });
         addActor(backButton);
@@ -146,11 +144,15 @@ public class PlayStage extends BaseStage {
         BitmapFont font = new BitmapFont();
         Label.LabelStyle labelStyle = new Label.LabelStyle( font, Color.BLUE );
 
-        TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle( skin.getDrawable("gray"), skin.getDrawable("light_gray"),null,font );
+        Label.LabelStyle chinaStyle = new Label.LabelStyle();
+        chinaStyle.font = getMainGame().getFont();
+
+
+        TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle( skin.getDrawable("gray"), skin.getDrawable("light_gray"),null,chinaStyle.font );
         skin.add("default",buttonStyle);
         Window.WindowStyle windowStyle = new Window.WindowStyle( font, Color.GREEN, skin.getDrawable( "light_gray" ) );
         skin.add("default",windowStyle);
-        skin.add("default",labelStyle);
+        skin.add("default",chinaStyle);
 
         dailogButton = new TextButton("click",skin);
         dailogButton.setPosition(300,20);
@@ -161,11 +163,10 @@ public class PlayStage extends BaseStage {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                if(dialog!= null){
-                   dialog.show(PlayStage.this);
+                   dialog.show(TestStage.this);
                }
             }
         });
-
 
 // 对话框
         dialog = new Dialog("dialog",skin){
@@ -187,30 +188,57 @@ public class PlayStage extends BaseStage {
         dialog.pack();
 
 //显示中文的lable
-        Label.LabelStyle chinaStyle = new Label.LabelStyle();
-        chinaStyle.font = getMainGame().getFont();
-        msgLabelChinese = new Label("中国人啊啊啊啊",chinaStyle);
+        msgLabelChinese = new Label("中国人啊分辨率",chinaStyle);
         msgLabelChinese.setX(getWidth()/2);
         msgLabelChinese.setY(getHeight()/2);
         addActor(msgLabelChinese);
 
-        Camera camera = this.getCamera();
-        //camera.translate(100,0,0);
-        //camera.rotate(0,45,45,0);
+// 进入分辨率测试舞台的按钮
+        fenbianlvButton = new TextButton("分辨率",skin);
+        fenbianlvButton.setSize(100,60);
+        fenbianlvButton.setPosition(0,getHeight() - fenbianlvButton.getHeight());
+        addActor(fenbianlvButton);
+        fenbianlvButton.addListener(new ChangeListener(){
 
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                getMainGame().getMainScreen().showDpiStage();
+            }
+        });
 
+// 进入Camera测试舞台的按钮
+        cameraButton = new TextButton("Camera",skin);
+        cameraButton.setSize(100,60);
+        cameraButton.setPosition(0,getHeight() - cameraButton.getHeight() - cameraButton.getHeight() -1);
+        addActor(cameraButton);
+        cameraButton.addListener(new ChangeListener(){
 
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                getMainGame().getMainScreen().showDpiStage();
+            }
+        });
     }
 
     @Override
     public void act() {
         super.act();
-
     }
 
     @Override
     public void dispose() {
         super.dispose();
         skin.dispose();
+    }
+
+    long lastLogTime = 0;
+    @Override
+    public void draw() {
+        super.draw();
+        long time = System.currentTimeMillis();
+        if(time - lastLogTime > logWaitTime){
+            lastLogTime = time;
+            Logs.e("TestStage w:"+this.getWidth()+" H:"+getHeight() );
+        }
     }
 }

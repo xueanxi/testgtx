@@ -54,8 +54,8 @@ public class MainGame extends Game {
 
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("font/nangong.ttf"));
 		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-		parameter.size = 50;
-		parameter.characters +="中国人啊啊啊啊";//需要用到什么字，需要先加进来
+		parameter.size = 25;
+		parameter.characters +="中国人啊分辨率";//需要用到什么字，需要先加进来
 		parameter.color = Color.BLACK;
 		font = generator.generateFont(parameter); // font size 12 pixels
 		generator.dispose(); // don't forget to dispose to avoid memory leaks!
@@ -72,6 +72,7 @@ public class MainGame extends Game {
 
 		mainScreen = new MainScreen(this);
 		setScreen(mainScreen);
+		//Logs.e("after setScreen mainScreen.width = "+mainScreen.);
 	}
 
 /*	@Override
